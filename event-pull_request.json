@@ -1,0 +1,10 @@
+{
+  "action": "opened",
+  "number": 1,
+  "pull_request": {
+    "number": 1,
+    "head": { "ref": "feature/test" },
+    "base": { "ref": "main" }
+  },
+  "repository": { "full_name": "RonanVlak/DevOps_RonanVlak" }
+}
