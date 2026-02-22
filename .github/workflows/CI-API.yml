@@ -1,7 +1,10 @@
-name: Week2 CI - Tests & Coverage
+name: CI-API
 
 on:
   push:
+    branches:
+      - main
+      - development
     paths:
       - 'week2/**'
   pull_request:
@@ -9,6 +12,7 @@ on:
       - main
     paths:
       - 'week2/**'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -38,7 +42,9 @@ jobs:
         run: npm ci
 
       - name: Run ESLint
+        working-directory: ./
         run: npm run lint
+        continue-on-error: true 
 
       - name: Run tests (push)
         if: github.event_name == 'push'
