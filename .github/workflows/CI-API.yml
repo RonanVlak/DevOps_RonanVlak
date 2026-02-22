@@ -45,4 +45,3 @@ jobs:
           test-script: npm test
           threshold: 80
           annotations: all
-          output: comment
