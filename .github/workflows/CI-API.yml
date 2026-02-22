@@ -47,14 +47,14 @@ jobs:
         continue-on-error: true 
 
       - name: Run Tests & Jest Coverage Report
+        if: github.event_name == 'pull_request' || github.ref != 'refs/heads/main'
         uses: ArtiomTr/jest-coverage-report-action@v2
         with:
           working-directory: week2
           package-manager: npm
           test-script: npm test
-          annotations: none
           threshold: 80
-          # Op main: gebruik 'report-markdown' (geen crash). Op PR: gebruik 'comment'.
-          output: ${{ github.ref == 'refs/heads/main' && 'report-markdown' || 'comment' }}
-          # Op main: skip de vergelijkingstappen.
-          skip-step: ${{ github.ref == 'refs/heads/main' && 'all' || 'none' }}
+
+      - name: Run Tests (Main branch fix)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: npm test -- --coverage --ci --watchAll=false
