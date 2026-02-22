@@ -2,16 +2,12 @@ name: CI-API
 
 on:
   push:
-    branches:
-      - main
-      - development
+    branches: [main, development]
     paths:
       - 'week2/**'
+      - '.github/workflows/**'
   pull_request:
-    branches:
-      - main
-    paths:
-      - 'week2/**'
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -22,10 +18,6 @@ permissions:
 jobs:
   test-and-coverage:
     runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: ./week2
 
     steps:
       - name: Checkout code
@@ -39,15 +31,17 @@ jobs:
           cache-dependency-path: 'week2/package-lock.json'
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm install
+          cd week2 && npm ci
 
       - name: Run ESLint
-        working-directory: ./
         run: npm run lint
         continue-on-error: true 
 
+      # ArtiomTr (Alleen bij PR)
       - name: Run Tests & Jest Coverage Report
-        if: github.event_name == 'pull_request' || github.ref != 'refs/heads/main'
+        if: github.event_name == 'pull_request'
         uses: ArtiomTr/jest-coverage-report-action@v2
         with:
           working-directory: week2
@@ -55,6 +49,8 @@ jobs:
           test-script: npm test
           threshold: 80
 
+      # Stap 4: Simpele run voor de groene badge op Main
       - name: Run Tests (Main branch fix)
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name != 'pull_request'
+        working-directory: ./week2
         run: npm test -- --coverage --ci --watchAll=false
