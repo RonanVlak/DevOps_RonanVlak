@@ -46,5 +46,6 @@ jobs:
           working-directory: week2
           package-manager: npm
           test-script: npm test
-          threshold: 20
-          annotations: all
+          annotations: none
+          output: report
+          threshold: 80
