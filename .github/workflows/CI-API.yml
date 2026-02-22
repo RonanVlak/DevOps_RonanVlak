@@ -2,13 +2,13 @@ name: Week2 CI - Tests & Coverage
 
 on:
   push:
-    paths:
-      - 'week2/**'
+    branches:
+      - main
+      - development 
   pull_request:
     branches:
       - main
-    paths:
-      - 'week2/**'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -47,5 +47,5 @@ jobs:
           package-manager: npm
           test-script: npm test
           annotations: none
-          output: report
+          output: comment
           threshold: 80
