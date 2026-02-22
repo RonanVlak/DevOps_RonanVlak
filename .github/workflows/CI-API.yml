@@ -47,5 +47,5 @@ jobs:
           package-manager: npm
           test-script: npm test
           annotations: none
-          output: report 
+          output: report-markdown
           threshold: 80
