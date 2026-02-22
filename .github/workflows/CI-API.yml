@@ -46,17 +46,15 @@ jobs:
         run: npm run lint
         continue-on-error: true 
 
-      - name: Run tests (push)
-        if: github.event_name == 'push'
-        run: npm test -- --ci
-
-      - name: Run tests & Jest Coverage Report (pull request)
-        if: github.event_name == 'pull_request'
+      - name: Run Tests & Jest Coverage Report
+        if: github.event_name == 'pull_request' || github.ref != 'refs/heads/main'
         uses: ArtiomTr/jest-coverage-report-action@v2
         with:
           working-directory: week2
           package-manager: npm
           test-script: npm test
-          annotations: none
-          output: comment
           threshold: 80
+
+      - name: Run Tests (Main branch fix)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: npm test -- --coverage --ci --watchAll=false
