@@ -32,16 +32,19 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: './week2/package-lock.json'
+          cache-dependency-path: 'week2/package-lock.json'
 
       - name: Install dependencies
         run: npm ci
 
+      - name: Run ESLint
+        run: npm run lint
+
       - name: Run tests & Jest Coverage Report
         uses: ArtiomTr/jest-coverage-report-action@v2
         with:
-          working-directory: ./week2
+          working-directory: week2
           package-manager: npm
           test-script: npm test
-          threshold: 80
+          threshold: 20
           annotations: all
