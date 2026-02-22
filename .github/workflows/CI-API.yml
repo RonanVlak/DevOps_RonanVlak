@@ -6,7 +6,7 @@ on:
       - main
       - development
     paths:
-      - 'week2/**'      # In jouw opdracht stond 'api/**', pas dit aan naar jouw folder
+      - 'week2/**'
   pull_request:
     branches:
       - main
