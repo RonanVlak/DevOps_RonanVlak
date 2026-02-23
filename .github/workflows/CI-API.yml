@@ -3,9 +3,6 @@ name: CI-API
 on:
   push:
     branches: [main, development]
-    paths:
-      - 'week2/**'
-      - '.github/workflows/**'
   pull_request:
     branches: [main]
   workflow_dispatch:
