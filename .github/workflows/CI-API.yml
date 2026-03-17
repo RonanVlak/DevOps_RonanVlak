@@ -25,12 +25,12 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: 'week2/package-lock.json'
+          cache-dependency-path: 'eindopdracht/package-lock.json'
 
       - name: Install dependencies
         run: |
           npm install
-          cd week2 && npm ci
+          cd eindopdracht && npm ci
 
       - name: Run ESLint
         run: npm run lint
@@ -41,7 +41,7 @@ jobs:
         if: github.event_name == 'pull_request'
         uses: ArtiomTr/jest-coverage-report-action@v2
         with:
-          working-directory: week2
+          working-directory: eindopdracht
           package-manager: npm
           test-script: npm test
           threshold: 80
@@ -49,5 +49,5 @@ jobs:
       # Stap 4: Simpele run voor de groene badge op Main
       - name: Run Tests (Main branch fix)
         if: github.event_name != 'pull_request'
-        working-directory: ./week2
+        working-directory: ./eindopdracht
         run: npm test -- --coverage --ci --watchAll=false
