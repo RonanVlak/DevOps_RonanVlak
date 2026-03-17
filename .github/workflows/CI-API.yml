@@ -66,5 +66,4 @@ jobs:
 
       - name: Run Vitest
         working-directory: ./eindopdracht/frontend
-        # De '--run' vlag zorgt dat Vitest stopt na de tests (geen watch mode)
-        run: npm test -- --run
+        run: npx vitest run
