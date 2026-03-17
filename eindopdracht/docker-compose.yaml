@@ -1,0 +1,71 @@
+services:
+  mongo:
+    image: mongo:6.0
+    restart: always
+    env_file:
+      - .env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DB}
+    volumes:
+      - ./data/db:/data/db
+    networks:
+      - devops-net
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    env_file:
+      - .env
+    environment:
+      PORT: ${PORT}
+      MONGO_URL: ${MONGO_URL}
+    ports:
+      - "${HOST_PORT}:${PORT}"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      - mongo
+    networks:
+      - devops-net
+    
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    image: eindopdracht-frontend:prod
+    environment:
+      - API_URL=${FRONTEND_API_URL:-http://localhost:3000}
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+    networks:
+      - devops-net
+
+  frontend-dev:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    image: eindopdracht-frontend:dev
+    environment:
+      - API_URL=${FRONTEND_API_URL:-http://localhost:3000}
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "4200:4200"
+    networks:
+      - devops-net
+    command: ["npm","run","start","--","--host","0.0.0.0","--poll=2000"]
+
+
+networks:
+  devops-net:
+    driver: bridge

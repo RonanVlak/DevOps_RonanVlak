@@ -1,4 +1,4 @@
-name: CI-API
+name: CI-FullStack
 
 on:
   push:
@@ -13,9 +13,9 @@ permissions:
   pull-requests: write
 
 jobs:
-  test-and-coverage:
+  test-api:
+    name: Backend Tests (Jest)
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -25,29 +25,45 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: 'week2/package-lock.json'
+          cache-dependency-path: eindopdracht/package-lock.json
 
-      - name: Install dependencies
-        run: |
-          npm install
-          cd week2 && npm ci
+      - name: Install API dependencies
+        working-directory: ./eindopdracht
+        run: npm ci
 
-      - name: Run ESLint
-        run: npm run lint
-        continue-on-error: true 
-
-      # ArtiomTr (Alleen bij PR)
-      - name: Run Tests & Jest Coverage Report
+      - name: Run Jest Coverage (PR only)
         if: github.event_name == 'pull_request'
         uses: ArtiomTr/jest-coverage-report-action@v2
         with:
-          working-directory: week2
+          working-directory: eindopdracht
           package-manager: npm
-          test-script: npm test
+          # --roots . voorkomt dat Jest de frontend map scant
+          test-script: npm test -- --roots .
           threshold: 80
 
-      # Stap 4: Simpele run voor de groene badge op Main
-      - name: Run Tests (Main branch fix)
+      - name: Run Tests (Main/Dev)
         if: github.event_name != 'pull_request'
-        working-directory: ./week2
-        run: npm test -- --coverage --ci --watchAll=false
+        working-directory: ./eindopdracht
+        run: npm test -- --coverage --ci --watchAll=false --roots .
+
+  test-frontend:
+    name: Frontend Tests (Vitest)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: eindopdracht/frontend/package-lock.json
+
+      - name: Install Frontend dependencies
+        working-directory: ./eindopdracht/frontend
+        run: npm ci
+
+      - name: Run Vitest
+        working-directory: ./eindopdracht/frontend
+        run: npx vitest run

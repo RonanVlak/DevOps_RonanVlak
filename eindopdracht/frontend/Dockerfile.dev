@@ -1,0 +1,15 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Kopieer package files en installeer dependencies
+# Dit gebeurt tijdens de build en wordt opgeslagen in de image
+COPY package*.json ./
+RUN npm install
+
+# Kopieer de rest van de bestanden
+COPY . .
+
+# Angular poort openzetten
+EXPOSE 4200
+
