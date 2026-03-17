@@ -1,5 +1,4 @@
 import { defineConfig } from 'vitest/config';
-import angular from '@analogjs/vitest-angular';
 
 export default defineConfig({
   test: {
@@ -7,12 +6,14 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['src/test-setup.ts'],
     include: ['**/*.spec.ts'],
-    // Voeg dit toe om ESM problemen te voorkomen:
-    server: {
-      deps: {
-        inline: ['@analogjs/vitest-angular']
+    // Dit helpt om ESM/CJS mismatches te voorkomen
+    deps: {
+      optimizer: {
+        web: {
+          enabled: true,
+          include: ['@angular/core', '@angular/common', 'zone.js']
+        }
       }
     }
   },
-  plugins: [angular()],
 });
