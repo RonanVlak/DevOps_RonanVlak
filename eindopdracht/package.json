@@ -1,5 +1,5 @@
 {
-  "name": "week1",
+  "name": "eindopdracht",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -26,6 +26,9 @@
   "jest": {
     "preset": "@shelf/jest-mongodb",
     "testEnvironment": "node",
+    "testPathIgnorePatterns": [
+    "<rootDir>/frontend/"
+    ],
     "coveragePathIgnorePatterns": [
       "/node_modules/"
     ]
