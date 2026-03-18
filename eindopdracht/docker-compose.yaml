@@ -11,21 +11,36 @@ services:
     networks:
       - devops-net
 
+  messagebus:
+    image: rabbitmq:3-management
+    container_name: messagebus
+    hostname: "messagebus"
+    labels:
+      NAME: "messagebus"
+    ports:
+      - "4369:4369"
+      - "5671:5671"
+      - "5672:5672"
+      - "25672:25672"
+      - "15671:15671"
+      - "15672:15672"
+    networks:
+      - devops-net
+
   api:
     build:
       context: .
       dockerfile: Dockerfile
     restart: always
     environment:
-      PORT: ${PORT:-3000}
+      PORT: 80
       MONGO_URL: ${MONGO_URL:-mongodb://root:secret@mongo:27017/eindopdracht?authSource=admin}
+      RABBITMQ_URL: ${RABBITMQ_URL:-amqp://guest:guest@messagebus:5672}
     ports:
-      - "${HOST_PORT:-3000}:${PORT:-3000}"
-    volumes:
-      - .:/app
-      - /app/node_modules
+      - "80:80"
     depends_on:
       - mongo
+      - messagebus
     networks:
       - devops-net
     
@@ -35,9 +50,9 @@ services:
       dockerfile: Dockerfile.prod
     image: eindopdracht-frontend:prod
     environment:
-      - API_URL=${FRONTEND_API_URL:-http://localhost:3000}
+      - API_URL=${FRONTEND_API_URL:-/api}
     ports:
-      - "8080:80"
+      - "80:80"
     depends_on:
       - api
     networks:
@@ -57,6 +72,8 @@ services:
       - "host.docker.internal:host-gateway"
     ports:
       - "4200:4200"
+    depends_on:
+      - api
     networks:
       - devops-net
     command: ["npm","run","start","--","--host","0.0.0.0","--poll=2000"]
