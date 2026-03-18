@@ -5,9 +5,9 @@ services:
     env_file:
       - .env
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
-      MONGO_INITDB_DATABASE: ${MONGO_DB}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME:-root}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-secret}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-eindopdracht}
     volumes:
       - ./data/db:/data/db
     networks:
@@ -21,10 +21,10 @@ services:
     env_file:
       - .env
     environment:
-      PORT: ${PORT}
-      MONGO_URL: ${MONGO_URL}
+      PORT: ${PORT:-3000}
+      MONGO_URL: ${MONGO_URL:-mongodb://root:secret@mongo:27017/eindopdracht?authSource=admin}
     ports:
-      - "${HOST_PORT}:${PORT}"
+      - "${HOST_PORT:-3000}:${PORT:-3000}"
     volumes:
       - .:/app
       - /app/node_modules
