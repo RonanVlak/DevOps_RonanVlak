@@ -1,8 +1,8 @@
-name: CI-FullStack
+name: CI-API
 
 on:
   push:
-    branches: [main, development]
+    branches: [development]
   pull_request:
     branches: [main]
   workflow_dispatch:
