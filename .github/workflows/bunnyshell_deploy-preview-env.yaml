@@ -22,10 +22,10 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' && needs.load-artifact-from-reusable.outputs.skip-deployment == 'false' }}
     with:
       pr-number: ${{ needs.load-artifact-from-reusable.outputs.pr-number }}
-      project-id: ${{ vars.BUNNYSHELL_PROJECT_ID }}
-      cluster-id: ${{ vars.BUNNYSHELL_CLUSTER_ID }}
+      project-id: ${{ secrets.BNS_PROJECT_ID }}
+      cluster-id: ${{ secrets.BNS_CLUSTER_ID }}
       env-name: "Demo PR #${{ needs.load-artifact-from-reusable.outputs.pr-number }}"
       bunnyshell-yaml-contents: ${{ needs.load-artifact-from-reusable.outputs.bunnyshell-yaml-contents }}
       comment-on-pr: true
     secrets:
-      bunnyshell-access-token: ${{ secrets.BUNNYSHELL_ACCESS_TOKEN }}
+      bunnyshell-access-token: ${{ secrets.BNS_ACCESS_TOKEN }}
