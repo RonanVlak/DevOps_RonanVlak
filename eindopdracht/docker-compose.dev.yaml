@@ -6,9 +6,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-secret}
       MONGO_INITDB_DATABASE: ${MONGO_DB:-eindopdracht}
     volumes:
-      - mongo-db-data:/data/db
-    deploy:
-      replicas: 1
+      - mongo-dev-data:/data/db
     networks:
       - devops-net
 
@@ -17,8 +15,7 @@ services:
     hostname: "messagebus"
     ports:
       - "15672:15672"
-    deploy:
-      replicas: 1
+      - "5672:5672"
     networks:
       - devops-net
 
@@ -26,37 +23,42 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: mijn-api:latest
     environment:
       PORT: 80
       MONGO_URL: ${MONGO_URL:-mongodb://root:secret@mongo:27017/eindopdracht?authSource=admin}
       RABBITMQ_URL: ${RABBITMQ_URL:-amqp://guest:guest@messagebus:5672}
+    volumes:
+      - .:/app
+      - /app/node_modules
     ports:
       - "3000:80"
-    deploy:
-      replicas: 2  #Start met 2 instanties
-      restart_policy:
-        condition: on-failure
+    depends_on:
+      - mongo
+      - messagebus
     networks:
       - devops-net
-
+    
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile.prod
-    image: mijn-frontend:latest
+      dockerfile: Dockerfile.dev
     environment:
-      - API_URL=http://localhost:3000/api
+      - API_URL=${FRONTEND_API_URL:-http://localhost:3000}
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
-      - "80:80"
-    deploy:
-      replicas: 1
+      - "4200:4200"
+    depends_on:
+      - api
     networks:
       - devops-net
+    command: ["npm", "run", "start", "--", "--host", "0.0.0.0", "--poll=2000"]
 
 networks:
   devops-net:
-    driver: overlay # Overlay gebruiken voor swarm communicatie
-
+    driver: bridge
 volumes:
-  mongo-db-data:
+  mongo-dev-data:
