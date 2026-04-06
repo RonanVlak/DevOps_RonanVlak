@@ -14,8 +14,8 @@ services:
     image: rabbitmq:3-management
     hostname: "messagebus"
     ports:
-      - "15672:15672"
-      - "5672:5672"
+      - "15673:15672"
+      - "5673:5672"
     networks:
       - devops-net
 
@@ -56,6 +56,44 @@ services:
     networks:
       - devops-net
     command: ["npm", "run", "start", "--", "--host", "0.0.0.0", "--poll=2000"]
+
+  db-exporter:
+    image: percona/mongodb_exporter:0.40 
+    ports:
+      - "9216:9216"
+    environment:
+      MONGODB_URI: ${MONGO_URL:-mongodb://root:secret@mongo:27017/admin?authSource=admin}
+    command:
+      - "--collect-all"
+      - "--compatible-mode"
+    networks:
+      - devops-net
+    depends_on:
+      - mongo
+
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    depends_on:
+      - api
+      - db-exporter
+    networks:
+      - devops-net
+    
+  grafana:
+    build:
+      context: ./grafana
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3000" 
+    depends_on:
+      - prometheus
+    networks:
+      - devops-net
 
 networks:
   devops-net:
