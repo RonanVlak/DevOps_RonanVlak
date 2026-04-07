@@ -1,0 +1,11 @@
+groups:
+- name: ServiceStatus
+  rules:
+  - alert: InstanceDown
+    expr: up == 0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Service {{ $labels.instance }} is down"
+      description: "De service {{ $labels.job }} op {{ $labels.instance }} reageert al meer dan 1 minuut niet."

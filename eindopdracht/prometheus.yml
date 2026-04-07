@@ -1,0 +1,24 @@
+global:
+  scrape_interval: 5s # Hoe vaak Prometheus data ophaalt
+
+scrape_configs:
+  # 1. Express API
+  - job_name: 'api'
+    static_configs:
+      # Binnen het Docker netwerk draait de API op poort 80
+      - targets: ['api:80']
+
+  # 2. De MongoDB Exporter
+  - job_name: 'mongodb'
+    static_configs:
+      # De standaard poort voor de mongodb-exporter is 9216
+      - targets: ['db-exporter:9216']
+
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets:
+      - 'alertmanager:9093'
+
+rule_files:
+  - "alert.rules"
