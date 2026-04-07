@@ -26,7 +26,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: mijn-api:latest
+    image: localhost:5000/mijn-api:latest
     environment:
       PORT: 80
       MONGO_URL: ${MONGO_URL:-mongodb://root:secret@mongo:27017/eindopdracht?authSource=admin}
@@ -44,7 +44,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.prod
-    image: mijn-frontend:latest
+    image: localhost:5000/mijn-frontend:latest
     environment:
       - API_URL=http://localhost:3000/api
     ports:
@@ -68,10 +68,34 @@ services:
     depends_on:
       - mongo
 
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    ports:
+      - "9093:9093"
+    env_file:
+      - .env
+    volumes:
+      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        # Kopieer naar tmp om de Docker volume beveiliging te omzeilen
+        cp /etc/alertmanager/alertmanager.yml /tmp/alertmanager.yml
+        sed -i "s|SENDER_EMAIL|$${GMAIL_EMAIL}|g" /tmp/alertmanager.yml
+        sed -i "s|SENDER_PASSWORD|$${GMAIL_APP_PASSWORD}|g" /tmp/alertmanager.yml
+        /bin/alertmanager --config.file=/tmp/alertmanager.yml
+    networks:
+      - devops-net
+    deploy:
+      replicas: 1
+
   prometheus:
     image: prom/prometheus:latest
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./alert.rules:/etc/prometheus/alert.rules
     ports:
       - "9090:9090"
     deploy:

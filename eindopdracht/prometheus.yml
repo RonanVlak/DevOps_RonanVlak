@@ -13,3 +13,12 @@ scrape_configs:
     static_configs:
       # De standaard poort voor de mongodb-exporter is 9216
       - targets: ['db-exporter:9216']
+
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets:
+      - 'alertmanager:9093'
+
+rule_files:
+  - "alert.rules"
