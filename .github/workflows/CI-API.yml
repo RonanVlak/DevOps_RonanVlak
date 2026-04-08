@@ -26,10 +26,11 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Install root dependencies
+        run: npm install
+
       - name: Run ESLint
-        run: |
-          npm install -g eslint
-          npx eslint "eindopdracht/**/*.js" --no-error-on-unmatched-pattern
+        run: npx eslint "eindopdracht/**/*.js"
 
   # 2. API Tests
   test-api:
