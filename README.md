@@ -37,17 +37,26 @@ Dit project demonstreert een event-driven architectuur. Wanneer er een nieuwe ge
 ### 1. Swarm Initialiseren
 
 Activeer de Docker Swarm modus (indien nog niet actief):
+
+```bash
 docker swarm init
+```
 
 ### 2. Images Bouwen
 
 Bouw de lokale images voor de API, Worker en Frontend:
+
+```bash
 docker compose build
+```
 
 ### 3. De Stack Uitrollen
 
 Start de volledige stack binnen de Swarm omgeving:
+
+```bash
 docker stack deploy -c docker-compose.yml mijnproject
+```
 
 ## Toegang tot de Applicatie
 
@@ -60,13 +69,17 @@ docker stack deploy -c docker-compose.yml mijnproject
 
 Je kunt services dynamisch op- of afschalen zonder downtime:
 
-# Schaal de frontend op naar 3 instances
+### Schaal de frontend op naar 3 instances
 
+```bash
 docker service scale mijnproject_frontend=3
+```
 
-# Controleer de status van de replica's
+### Controleer de status van de replica's
 
+```bash
 docker service ls
+```
 
 ## Continuous Integration (GitHub Actions)
 
