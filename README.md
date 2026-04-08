@@ -1,5 +1,10 @@
 [![CI-API](https://github.com/RonanVlak/DevOps_RonanVlak/actions/workflows/CI-API.yml/badge.svg?branch=main)](https://github.com/RonanVlak/DevOps_RonanVlak/actions/workflows/CI-API.yml)
 
+| Service | Status |
+| :--- | :--- |
+| **API** | [![API Status](https://github.com/RonanVlak/DevOps_RonanVlak/actions/workflows/CI-API.yml/badge.svg?branch=main&job=test-api)](https://github.com/RonanVlak/DevOps_RonanVlak/actions) |
+| **Worker** | [![Worker Status](https://github.com/RonanVlak/DevOps_RonanVlak/actions/workflows/CI-API.yml/badge.svg?branch=main&job=test-worker)](https://github.com/RonanVlak/DevOps_RonanVlak/actions) |
+| **Frontend** | [![Frontend Status](https://github.com/RonanVlak/DevOps_RonanVlak/actions/workflows/CI-API.yml/badge.svg?branch=main&job=test-frontend)](https://github.com/RonanVlak/DevOps_RonanVlak/actions) |
 
 # DevOps Eindopdracht
 

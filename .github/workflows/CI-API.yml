@@ -13,8 +13,29 @@ permissions:
   pull-requests: write
 
 jobs:
+  # 1. Linting
+  lint-code:
+    name: Code Guidelines Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install root dependencies
+        run: npm install
+
+      - name: Run ESLint
+        run: npx eslint "eindopdracht/**/*.js"
+
+  # 2. API Tests
   test-api:
-    name: Backend Tests (Jest)
+    name: API Tests (Jest)
+    needs: lint-code
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -37,7 +58,6 @@ jobs:
         with:
           working-directory: eindopdracht
           package-manager: npm
-          # --roots . voorkomt dat Jest de frontend map scant
           test-script: npm test -- --roots .
           threshold: 80
 
@@ -46,8 +66,32 @@ jobs:
         working-directory: ./eindopdracht
         run: npm test -- --coverage --ci --watchAll=false --roots .
 
+  # 3. Worker Tests
+  test-worker:
+    name: Worker Tests (Jest)
+    needs: lint-code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Worker dependencies
+        working-directory: ./eindopdracht/worker
+        run: npm ci 
+
+      - name: Run Worker Tests
+        working-directory: ./eindopdracht/worker
+        run: npm run test
+
+  # 4. Frontend Tests
   test-frontend:
     name: Frontend Tests (Vitest)
+    needs: lint-code
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -66,4 +110,4 @@ jobs:
 
       - name: Run Vitest
         working-directory: ./eindopdracht/frontend
-        run: npx vitest run
+        run: npx vitest run --run # --run zorgt dat hij niet blijft hangen in watch mode
