@@ -1,37 +1,27 @@
-<style>
-  .container {
-    font-family: sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    background-color: #f0f4f8;
-    color: #333;
-  }
-  .card {
-    background: white;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    text-align: center;
-  }
-  h1 { color: #007bff; }
-  .status { 
-    margin-top: 1rem;
-    font-size: 0.9rem;
-    color: #666;
-  }
-</style>
-
 <div class="container">
   <div class="card">
-    <h1>Hello World</h1>
-    <p>Mijn Angular app draait nu op <strong>Bunnyshell</strong> met een geupdate preview.</p>
+    <h1>{{ title() }}</h1>
     
-    <div class="status">
-      <p>Project: DevOps Eindopdracht</p>
-      <p>App Title: {{ title() }}</p>
+    <div class="input-section">
+      <input 
+        [(ngModel)]="newUserName" 
+        placeholder="Naam invoeren..."
+        (keyup.enter)="addUser()"
+      >
+      <button (click)="addUser()">Toevoegen</button>
+    </div>
+
+    <hr>
+
+    <div class="user-list">
+      <h3>Gebruikers in Database A:</h3>
+      <ul>
+        @for (user of users(); track user._id) {
+          <li>👤 {{ user.naam }}</li>
+        } @empty {
+          <p>Geen gebruikers gevonden.</p>
+        }
+      </ul>
     </div>
   </div>
 </div>
