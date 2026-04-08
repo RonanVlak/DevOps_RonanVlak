@@ -34,11 +34,41 @@ services:
     ports:
       - "3000:80"
     deploy:
-      replicas: 2  #Start met 2 instanties
+      replicas: 1
       restart_policy:
         condition: on-failure
     networks:
       - devops-net
+
+  mongo-worker:
+    image: mongo:6.0
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME:-root}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-secret}
+      MONGO_INITDB_DATABASE: workerdb
+    volumes:
+      - mongo-worker-data:/data/db
+    networks:
+      - devops-net
+    deploy:
+      replicas: 1
+
+
+  worker:
+    build:
+      context: ./worker
+      dockerfile: Dockerfile
+    image: mijn-worker:latest
+    environment:
+      RABBITMQ_URL: ${RABBITMQ_URL:-amqp://guest:guest@messagebus:5672}
+      MONGO_WORKER_URL: mongodb://${MONGO_USERNAME:-root}:${MONGO_PASSWORD:-secret}@mongo-worker:27017/workerdb?authSource=admin
+    networks:
+      - devops-net
+    depends_on:
+      - messagebus
+      - mongo-worker
+    deploy:
+      replicas: 1
 
   frontend:
     build:
@@ -126,3 +156,4 @@ networks:
 
 volumes:
   mongo-db-data:
+  mongo-worker-data:
