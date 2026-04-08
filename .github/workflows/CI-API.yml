@@ -28,7 +28,8 @@ jobs:
 
       - name: Run ESLint
         run: |
-          npm run lint
+          npm install -g eslint
+          npx eslint "eindopdracht/**/*.js" --no-error-on-unmatched-pattern
 
   # 2. API Tests
   test-api:
