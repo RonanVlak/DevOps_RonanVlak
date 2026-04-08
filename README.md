@@ -10,54 +10,82 @@
 
 ## Architectuur
 
-De applicatie draait in containers en bestaat uit de volgende services:
-* **Frontend:** Web client (gehost op poort `80`)
-* **API:** Backend server (gehost op poort `3000`)
-* **MongoDB:** NoSQL Database (intern afgeschermd)
-* **RabbitMQ:** Message Broker (Management UI op poort `15672`)
+De applicatie is opgebouwd volgens een microservices-architectuur en draait volledig in Docker-containers binnen een Swarm omgeving.
+
+### Componenten
+
+* **Frontend:** Angular web client (gehost op poort 8080).
+* **API:** Node.js Express backend server (gehost op poort 3000).
+* **Worker:** Een asynchrone service die zware taken verwerkt vanuit de message queue.
+* **MongoDB (Database A):** Hoofddatabase voor de API.
+* **Mongo Worker (Database B):** Gescheiden database voor de Worker-service.
+* **RabbitMQ:** Message Broker voor onderlinge communicatie tussen services.
+* **Monitoring:** Prometheus (metrics), Alertmanager (notificaties) en Grafana (dashboards).
+
+## Messaging & Microservices
+
+Dit project demonstreert een event-driven architectuur. Wanneer er een nieuwe gebruiker wordt aangemaakt via de API, gebeurt het volgende:
+
+1. De API slaat de data op in de hoofd-database (Database A).
+2. De API plaatst een UserAangemaakt event op de RabbitMQ message bus.
+3. De Worker pakt dit bericht direct op uit de queue.
+4. De Worker logt de actie in zijn eigen, gescheiden database (Database B).
 
 
-### Swarm Initialiseren
-Activeer de Docker Swarm modus op je machine (dit hoeft maar één keer per systeem):
+## Installatie & Deployment (Docker Swarm)
+
+### 1. Swarm Initialiseren
+
+Activeer de Docker Swarm modus (indien nog niet actief):
+
 ```bash
 docker swarm init
 ```
 
-### Images Bouwen
-Omdat Docker Swarm lokaal gebouwde images nodig heeft om lokaal te kunnen deployen, bouwen we de Frontend en API eerst lokaal met compose:
+### 2. Images Bouwen
+
+Bouw de lokale images voor de API, Worker en Frontend:
+
 ```bash
 docker compose build
 ```
 
-### De Stack Uitrollen (Deployen)
-Start de volledige stack binnen de Swarm onder de naam `mijnproject`:
+### 3. De Stack Uitrollen
+
+Start de volledige stack binnen de Swarm omgeving:
+
 ```bash
 docker stack deploy -c docker-compose.yml mijnproject
 ```
 
 ## Toegang tot de Applicatie
 
-Zodra de stack is uitgerold, verdeelt de Docker Swarm Routing Mesh het verkeer. De applicaties zijn via de browser te bereiken op de volgende adressen:
+* Frontend: http://localhost:8080
+* API: http://localhost:3000
+* Grafana Dashboard: http://localhost (Inlog: admin / admin)
+* RabbitMQ Dashboard: http://localhost:15672 (Inlog: guest / guest)
 
-* **Frontend:** [http://localhost](http://localhost)
-* **API:** [http://localhost:3000](http://localhost:3000)
-* **RabbitMQ Dashboard:** [http://localhost:15672](http://localhost:15672) *(Inlog: `guest` / `guest`)*
+## Horizontal Scaling
 
-## Horizontal Scaling & Orchestration
+Je kunt services dynamisch op- of afschalen zonder downtime:
 
-Een van de aspecten van dit project is het aantonen van horizontal scaling zonder een nieuw release-proces te hoeven doorlopen.
+### Schaal de frontend op naar 3 instances
 
-**Status Controleren:**
-Bekijk welke services draaien en hoeveel replica's er actief zijn:
+```bash
+docker service scale mijnproject_frontend=3
+```
+
+### Controleer de status van de replica's
+
 ```bash
 docker service ls
 ```
 
-**Live Schalen (Horizontal Scaling):**
-Je kunt de services opschalen bij piekdrukte. Schaal bijvoorbeeld de frontend dynamisch op naar 3 instances:
-```bash
-docker service scale mijnproject_frontend=3
-```
-*Docker Swarm verdeelt binnenkomend netwerkverkeer nu automatisch over deze 3 instances als een interne load balancer.*
+## Continuous Integration (GitHub Actions)
 
+Bij elke push naar de development branch of pull request naar main worden de volgende stappen automatisch uitgevoerd:
 
+* Linting: Code style check via ESLint op basis van de root-configuratie.
+* API Tests: Unittests met Jest en Supertest.
+* Worker Tests: Unittests met Jest en een In-Memory MongoDB server.
+* Frontend Tests: UI tests via Vitest.

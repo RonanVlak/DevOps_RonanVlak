@@ -42,7 +42,7 @@ async function startWorker() {
     }, { noAck: false });
 
   } catch (error) {
-    console.error("❌ Worker fout, probeer opnieuw in 5 sec...", error.message);
+    console.error("Worker fout, probeer opnieuw in 5 sec...", error.message);
     setTimeout(startWorker, 5000); // Retry
   }
 }
