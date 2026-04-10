@@ -17,7 +17,7 @@
       <h3>Gebruikers in Database A:</h3>
       <ul>
         @for (user of users(); track user._id) {
-          <li>👤 {{ user.naam }}</li>
+          <li>{{ user.naam }}</li>
         } @empty {
           <p>Geen gebruikers gevonden.</p>
         }
