@@ -98,6 +98,21 @@ services:
     depends_on:
       - mongo
 
+  worker-db-exporter:
+    image: percona/mongodb_exporter:0.40
+    ports:
+      - "9217:9216"
+    environment:
+      MONGODB_URI: mongodb://${MONGO_USERNAME:-root}:${MONGO_PASSWORD:-secret}@mongo-worker:27017/admin?authSource=admin
+    command:
+      - "--collect-all"
+      - "--compatible-mode"
+    networks:
+      - devops-net
+    depends_on:
+      - mongo-worker
+    deploy:
+      replicas: 1
 
   alertmanager:
     image: prom/alertmanager:latest
@@ -133,6 +148,7 @@ services:
     depends_on:
       - api
       - db-exporter
+      - worker-db-exporter
     networks:
       - devops-net
 

@@ -5,6 +5,30 @@ const rabbitUrl = process.env.RABBITMQ_URL || 'amqp://guest:guest@messagebus:567
 const mongoUrl = process.env.MONGO_WORKER_URL || 'mongodb://root:secret@mongo-worker:27017/workerdb?authSource=admin';
 const queue = 'user_events';
 
+const http = require('http');
+const prom = require('prom-client');
+
+// 1. Verzamel standaard statistieken
+prom.collectDefaultMetrics();
+
+// 2. Start een mini-server op poort 3000 voor Prometheus
+http.createServer(async (req, res) => {
+  if (req.url === '/metrics') {
+    try {
+      res.setHeader('Content-Type', prom.register.contentType);
+      res.end(await prom.register.metrics());
+    } catch (ex) {
+      res.statusCode = 500;
+      res.end(ex);
+    }
+  } else {
+    res.statusCode = 404;
+    res.end('Not Found');
+  }
+}).listen(3000, '0.0.0.0'); // '0.0.0.0' zorgt dat hij luistert op het Docker netwerk
+
+console.log("Worker metrics server luistert op poort 3000");
+
 async function startWorker() {
   try {
     // 1. Verbinden met Database B (Zijn eigen database!)
