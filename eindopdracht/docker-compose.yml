@@ -166,6 +166,21 @@ services:
     networks:
       - devops-net
 
+  dozzle:
+    image: amir20/dozzle:latest
+    volumes:
+      #Toegang tot alle container logs (alleen lezen)
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "8888:8080" #
+    networks:
+      - devops-net
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager # Zorgt dat hij op de hoofd-node draait waar de socket zit
+
 networks:
   devops-net:
     driver: overlay # Overlay gebruiken voor swarm communicatie
