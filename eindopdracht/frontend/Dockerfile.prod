@@ -8,21 +8,19 @@ RUN find dist -maxdepth 3
 
 FROM nginx:alpine
 
-# STAP A: Verwijder de standaard Nginx troep
+# STAP 1: Verwijder de standaard Nginx troep
 RUN rm -rf /usr/share/nginx/html/*
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# STAP B: Kopieer de inhoud van de eerste submap die je in dist vindt
+# STAP 2: Kopieer de inhoud van de eerste submap die je in dist vindt
 COPY --from=build /app/dist/browser/ /usr/share/nginx/html/
 
-# STAP C: Kopieer je assets voor de API config (zoals gevraagd in je opdracht)
+# STAP 3: Kopieer je assets voor de API config
 COPY assets/env.template.js /usr/share/nginx/html/assets/env.template.js
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 
-# OPTIONEEL: Als je routing (deep links) wilt laten werken, voeg een nginx.conf toe
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 ENTRYPOINT ["/docker-entrypoint.sh"]
