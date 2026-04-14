@@ -87,7 +87,7 @@ services:
   db-exporter:
     image: percona/mongodb_exporter:0.40 
     ports:
-      - "9216:9216"
+      - "9218:9216"
     environment:
       MONGODB_URI: ${MONGO_URL:-mongodb://root:secret@mongo:27017/admin?authSource=admin}
     command:
@@ -101,7 +101,7 @@ services:
   worker-db-exporter:
     image: percona/mongodb_exporter:0.40
     ports:
-      - "9217:9216"
+      - "9219:9216"
     environment:
       MONGODB_URI: mongodb://${MONGO_USERNAME:-root}:${MONGO_PASSWORD:-secret}@mongo-worker:27017/admin?authSource=admin
     command:
@@ -138,7 +138,7 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
       - ./alert.rules:/etc/prometheus/alert.rules
     ports:
-      - "9090:9090"
+      - "9091:9090"
     depends_on:
       - api
       - db-exporter
@@ -162,10 +162,10 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     ports:
-      - "8888:8080"
+      - "8889:8080"
     networks:
       - devops-net
-      
+
 networks:
   devops-net:
     driver: bridge 
